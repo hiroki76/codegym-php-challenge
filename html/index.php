@@ -42,6 +42,7 @@ if ($_POST) { /* POST Requests */
 $tweets = getTweets();
 $tweet_count = count($tweets);
 /* 返信課題はここからのコードを修正しましょう。 */
+
 /* 返信課題はここからのコードを修正しましょう。 */
 ?>
 
@@ -58,6 +59,7 @@ $tweet_count = count($tweets);
         <form method="POST">
           <textarea class="form-control" type=textarea name="tweet_textarea" ?><!-- 返信課題はここを修正しましょう。 --></textarea>
           <!-- 返信課題はここからのコードを修正しましょう。 -->
+          
           <!-- 返信課題はここからのコードを修正しましょう。 -->
           <br>
           <input class="btn btn-primary" type=submit value="投稿">
