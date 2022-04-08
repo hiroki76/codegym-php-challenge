@@ -1,1 +1,1 @@
-ALTER TABLE 'tweets' ADD 'reply_id' INT NULL DEFAULT NULL ;
+ALTER TABLE tweets ADD reply_id INT;
