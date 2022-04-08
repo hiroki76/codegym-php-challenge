@@ -55,7 +55,7 @@ function createTweet($text, $user_id)
  */
 function getTweets()
 {
-    $sql = 'select t.id, t.text, t.user_id, t.created_at, t.updated_at, u.name';
+    $sql = 'select t.id, t.text, t.user_id, t.created_at, t.updated_at, u.name, t.reply_id';
     $sql .= ' from tweets t join users u on t.user_id = u.id';
     $sql .= ' order by t.updated_at desc';
     $stmt = getPdo()->prepare($sql);
@@ -64,6 +64,29 @@ function getTweets()
 }
 
 /* 返信課題はここからのコードを修正しましょう。 */
+function getTweet($id){
+    $stmt = getPdo()->query("SELECT * FROM tweets WHERE id = '$id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
 
+function getusername($user){
+    $stmt = getPdo()->query("SELECT * FROM users WHERE id = '$user'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
 
+    function createTweetreply($text, $user_id, $reply_id)
+{
+    $sql = 'insert into tweets (text, user_id, created_at, updated_at, reply_id)';
+    $sql .= ' values (:text, :user_id, :created_at, :updated_at, :reply_id)';
+    $now = date("Y-m-d H:i:s");
+    $stmt = getPdo()->prepare($sql);
+    $stmt->bindValue(':text', $text, PDO::PARAM_STR);
+    $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(':reply_id', $reply_id, PDO::PARAM_INT);
+    $stmt->bindValue(':created_at', $now, PDO::PARAM_STR);
+    $stmt->bindValue(':updated_at', $now, PDO::PARAM_STR);
+    return $stmt->execute();
+}
 /* 返信課題はここからのコードを修正しましょう。 */
