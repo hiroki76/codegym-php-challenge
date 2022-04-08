@@ -20,6 +20,11 @@ function newtweet($tweet_textarea)
     // 汎用ログインチェック処理をルータに作る。早期リターンで
     createTweet($tweet_textarea, $_SESSION['user_id']);
 }
+
+function newtweetreply($tweet_textarea)
+{
+    createTweetreply($tweet_textarea, $_SESSION['user_id'], $_POST['reply_id']);
+}
 /**
  * ログアウト処理を行う。
  */
@@ -33,17 +38,32 @@ if ($_POST) { /* POST Requests */
     if (isset($_POST['logout'])) { //ログアウト処理
         logout();
         header("Location: login.php");
+    } else if (isset($_POST['tweet_textarea'])& isset($_POST['reply_id'])) { //reply投稿処理
+        newtweetreply($_POST['tweet_textarea']);
+        header("Location: index.php");
     } else if (isset($_POST['tweet_textarea'])) { //投稿処理
         newtweet($_POST['tweet_textarea']);
         header("Location: index.php");
     }
 }
-
 $tweets = getTweets();
 $tweet_count = count($tweets);
-/* 返信課題はここからのコードを修正しましょう。 */
-/* 返信課題はここからのコードを修正しましょう。 */
+if(isset($_GET['n'])){
+  $n = $_GET['n'];
+}
+if(isset($_GET['notfavorite'])){
+    deletefavorite($_SESSION['user_id'], $_GET['notfavorite']);
+    header("Location: index.php");
+  }
+if(isset($_GET['favorite'])){ 
+   createfavorite($_SESSION['user_id'], $_GET['favorite']);
+   header("Location: index.php");
+  }
+  
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -56,9 +76,8 @@ $tweet_count = count($tweets);
     <div class="card mb-3">
       <div class="card-body">
         <form method="POST">
-          <textarea class="form-control" type=textarea name="tweet_textarea" ?><!-- 返信課題はここを修正しましょう。 --></textarea>
-          <!-- 返信課題はここからのコードを修正しましょう。 -->
-          <!-- 返信課題はここからのコードを修正しましょう。 -->
+          <textarea class="form-control" type=textarea name="tweet_textarea" ?><?php if(isset($n)){echo ' '.$n;} ?>&#13;</textarea>
+          <input type=hidden name="reply_id" value="<?php ini_set('display_errors', 0); echo $_GET['reply']; ?>">
           <br>
           <input class="btn btn-primary" type=submit value="投稿">
         </form>
@@ -70,9 +89,21 @@ $tweet_count = count($tweets);
         <div class="card-body">
           <p class="card-title"><b><?= "{$t['id']}" ?></b> <?= "{$t['name']}" ?> <small><?= "{$t['updated_at']}" ?></small></p>
           <p class="card-text"><?= "{$t['text']}" ?></p>
-          <!--返信課題はここから修正しましょう。-->
-          <!--<p>[返信する] [返信元のメッセージ]</p>-->
-          <!--返信課題はここまで修正しましょう。-->
+          <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
+            <?php if($t['reply_id'] > 0){echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';} ?>
+          <p><br>
+            <?php if(getfavorite($_SESSION['user_id'], $t['id'])){ ?>
+                      <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">
+                      <img class="favorite-image" src='/images/heart-solid-red.svg'></a>
+            <?php } else { ?>
+                      <a id=<?= "{$t['id']}" ?> href="index.php?favorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">  
+                      <img class="favorite-image" src='/images/heart-solid-gray.svg'></a>
+            <?php } 
+            $goukei = goukeifavorite($t['id']);
+            if($goukei[0][0] !== 0){
+                echo $goukei[0][0];
+            } ?>
+          </p>
         </div>
       </div>
     <?php } ?>
