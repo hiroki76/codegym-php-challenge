@@ -63,7 +63,6 @@ function getTweets()
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/* 返信課題はここからのコードを修正しましょう。 */
 function getTweet($id){
     $stmt = getPdo()->query("SELECT * FROM tweets WHERE id = '$id'");
     $rows = $stmt->fetchAll();
@@ -76,7 +75,7 @@ function getUserName($user){
     return $rows;
 }
 
-    function createTweetReply($text, $user_id, $reply_id)
+function createTweetReply($text, $user_id, $reply_id)
 {
     $sql = 'insert into tweets (text, user_id, created_at, updated_at, reply_id)';
     $sql .= ' values (:text, :user_id, :created_at, :updated_at, :reply_id)';
@@ -89,7 +88,6 @@ function getUserName($user){
     $stmt->bindValue(':updated_at', $now, PDO::PARAM_STR);
     return $stmt->execute();
 }
-/* 返信課題はここからのコードを修正しましょう。 */
 
 function createFavorite($member_id, $post_id)
 {
