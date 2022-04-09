@@ -6,7 +6,7 @@ require_once('functions.php');
 $tw = getTweet($_GET['id']);
 $tw = $tw[0];
 //print_r($tw);
-$us = getusername($tw['user_id']);
+$us = getUserName($tw['user_id']);
 $us = $us[0];
 /* 返信課題はここまでのコードを修正しましょう。 */
 ?>
