@@ -70,13 +70,13 @@ function getTweet($id){
     return $rows;
 }
 
-function getusername($user){
+function getUserName($user){
     $stmt = getPdo()->query("SELECT * FROM users WHERE id = '$user'");
     $rows = $stmt->fetchAll();
     return $rows;
 }
 
-    function createTweetreply($text, $user_id, $reply_id)
+    function createTweetReply($text, $user_id, $reply_id)
 {
     $sql = 'insert into tweets (text, user_id, created_at, updated_at, reply_id)';
     $sql .= ' values (:text, :user_id, :created_at, :updated_at, :reply_id)';
@@ -91,7 +91,7 @@ function getusername($user){
 }
 /* 返信課題はここからのコードを修正しましょう。 */
 
-function createfavorite($member_id, $post_id)
+function createFavorite($member_id, $post_id)
 {
     $sql = 'insert into favorites (member_id, post_id, created_at, updated_at)';
     $sql .= ' values (:member_id, :post_id, :created_at, :updated_at)';
@@ -104,19 +104,22 @@ function createfavorite($member_id, $post_id)
     return $stmt->execute();
 }
 
-function getfavorite($member_id, $post_id){
+function getFavorite($member_id, $post_id)
+{
     $stmt = getPdo()->query("SELECT * FROM favorites WHERE post_id = '$post_id' AND member_id = '$member_id'");
     $rows = $stmt->fetchAll();
     return $rows;
 }
 
-function deletefavorite($member_id, $post_id){
+function deleteFavorite($member_id, $post_id)
+{
     $stmt = getPdo()->query("DELETE FROM favorites WHERE post_id = '$post_id' AND member_id = '$member_id'");
     $rows = $stmt->fetchAll();
     return $rows;
 }
 
-function goukeifavorite($post_id){
+function getFavoritCount($post_id)
+{
     $stmt = getPdo()->query("SELECT COUNT(*) AS post_id FROM favorites WHERE post_id = '$post_id'");
     $rows = $stmt->fetchAll();
     return $rows;
