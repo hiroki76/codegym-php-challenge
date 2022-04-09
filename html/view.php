@@ -5,7 +5,6 @@ require_once('functions.php');
 /* 返信課題はここからのコードを修正しましょう。 */
 $tw = getTweet($_GET['id']);
 $tw = $tw[0];
-//print_r($tw);
 $us = getUserName($tw['user_id']);
 $us = $us[0];
 /* 返信課題はここまでのコードを修正しましょう。 */
