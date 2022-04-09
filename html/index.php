@@ -48,7 +48,9 @@ if ($_POST) { /* POST Requests */
 }
 
 $tweets = getTweets();
+//print_r($tweets);
 $tweet_count = count($tweets);
+<<<<<<< HEAD
 if(isset($_GET['n'])){
   $n = $_GET['n'];
 }
@@ -60,6 +62,14 @@ if(isset($_GET['favorite'])){
    createfavorite($_SESSION['user_id'], $_GET['favorite']);
    header("Location: index.php");
   }
+=======
+/* 返信課題はここからのコードを修正しましょう。 */
+if(isset($_GET['n'])){
+  $n = $_GET['n'];
+}
+//var_dump($reply);
+/* 返信課題はここからのコードを修正しましょう。 */
+>>>>>>> main
 ?>
 
 <!DOCTYPE html>
@@ -88,6 +98,7 @@ if(isset($_GET['favorite'])){
         <div class="card-body">
           <p class="card-title"><b><?= "{$t['id']}" ?></b> <?= "{$t['name']}" ?> <small><?= "{$t['updated_at']}" ?></small></p>
           <p class="card-text"><?= "{$t['text']}" ?></p>
+<<<<<<< HEAD
           <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
           <?php 
           if($t['reply_id'] > 0){
@@ -105,6 +116,16 @@ if(isset($_GET['favorite'])){
             if($goukei[0][0] !== 0){
                 echo $goukei[0][0];
             } ?>
+=======
+          <!--返信課題はここから修正しましょう。-->
+          <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
+          <?php 
+          //var_dump($re);
+          if($t['reply_id'] > 0){
+            echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';
+          }?>
+          <!--返信課題はここまで修正しましょう。-->
+>>>>>>> main
         </div>
       </div>
     <?php } ?>
