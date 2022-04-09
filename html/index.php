@@ -3,9 +3,10 @@
 session_start();
 
 //ログインしていない場合、login.phpを表示
-if (empty($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
+if (empty($_SESSION['user_id'])) 
+{
+  header('Location: login.php');
+  exit;
 }
 
 require_once('db.php');
@@ -17,49 +18,58 @@ require_once('functions.php');
  */
 function newTweet($tweet_textarea)
 {
-    // 汎用ログインチェック処理をルータに作る。早期リターンで
-    createTweet($tweet_textarea, $_SESSION['user_id']);
+  // 汎用ログインチェック処理をルータに作る。早期リターンで
+  createTweet($tweet_textarea, $_SESSION['user_id']);
 }
 
 function newTweetReply($tweet_textarea)
 {
-    createTweetReply($tweet_textarea, $_SESSION['user_id'], $_POST['reply_id']);
+  createTweetReply($tweet_textarea, $_SESSION['user_id'], $_POST['reply_id']);
 }
 /**
  * ログアウト処理を行う。
  */
 function logout()
 {
-    $_SESSION = [];
-    $msg = 'ログアウトしました。';
+  $_SESSION = [];
+  $msg = 'ログアウトしました。';
 }
 
-if ($_POST) { /* POST Requests */
-    if (isset($_POST['logout'])) { //ログアウト処理
-        logout();
-        header("Location: login.php");
-    } else if (isset($_POST['tweet_textarea'])& isset($_POST['reply_id'])) { //reply投稿処理
-        newTweetReply($_POST['tweet_textarea']);
-        header("Location: index.php");
-    } else if (isset($_POST['tweet_textarea'])) { //投稿処理
-        newTweet($_POST['tweet_textarea']);
-        header("Location: index.php");
+if ($_POST) 
+{ /* POST Requests */
+    if (isset($_POST['logout'])) 
+    { //ログアウト処理
+      logout();
+      header("Location: login.php");
+    } 
+    else if (isset($_POST['tweet_textarea'])& isset($_POST['reply_id'])) 
+    { //reply投稿処理
+      newTweetReply($_POST['tweet_textarea']);
+      header("Location: index.php");
+    } 
+    else if (isset($_POST['tweet_textarea'])) 
+    { //投稿処理
+      newTweet($_POST['tweet_textarea']);
+      header("Location: index.php");
     }
 }
 
 $tweets = getTweets();
 $tweet_count = count($tweets);
-if(isset($_GET['n'])){
+if(isset($_GET['n']))
+{
   $n = $_GET['n'];
 }
-if(isset($_GET['notfavorite'])){
-    deleteFavorite($_SESSION['user_id'], $_GET['notfavorite']);
-    header("Location: index.php");
-  }
-if(isset($_GET['favorite'])){ 
-   createFavorite($_SESSION['user_id'], $_GET['favorite']);
-   header("Location: index.php");
-  }
+if(isset($_GET['notfavorite']))
+{
+  deleteFavorite($_SESSION['user_id'], $_GET['notfavorite']);
+  header("Location: index.php");
+}
+if(isset($_GET['favorite']))
+{ 
+  createFavorite($_SESSION['user_id'], $_GET['favorite']);
+  header("Location: index.php");
+}
 ?>
 
 <!DOCTYPE html>
@@ -74,9 +84,7 @@ if(isset($_GET['favorite'])){
       <div class="card-body">
         <form method="POST">
           <textarea class="form-control" type=textarea name="tweet_textarea" ?><?php if(isset($n)){echo ' '.$n;} ?>&#13;</textarea>
-          <!-- 返信課題はここからのコードを修正しましょう。 -->
           <input type=hidden name="reply_id" value="<?php ini_set('display_errors', 0); echo $_GET['reply']; ?>">
-          <!-- 返信課題はここからのコードを修正しましょう。 -->
           <br>
           <input class="btn btn-primary" type=submit value="投稿">
         </form>
@@ -90,21 +98,30 @@ if(isset($_GET['favorite'])){
           <p class="card-text"><?= "{$t['text']}" ?></p>
           <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
           <?php 
-          if($t['reply_id'] > 0){
+          if($t['reply_id'] > 0)
+          {
             echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';
           }?>
           <p><br>
-            <?php if(getFavorite($_SESSION['user_id'], $t['id'])){ ?>
-                      <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">
-                      <img class="favorite-image" src='/images/heart-solid-red.svg'></a>
-            <?php } else { ?>
-                      <a id=<?= "{$t['id']}" ?> href="index.php?favorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">  
-                      <img class="favorite-image" src='/images/heart-solid-gray.svg'></a>
-            <?php } 
-            $sum = getFavoritCount($t['id']);
-            if($sum[0][0] !== 0){
-                echo $sum[0][0];
-            } ?>
+          <?php
+          if(getFavorite($_SESSION['user_id'], $t['id']))
+          { ?>
+            <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">
+            <img class="favorite-image" src='/images/heart-solid-red.svg'></a>
+          <?php
+          } 
+          else 
+          { ?>
+            <a id=<?= "{$t['id']}" ?> href="index.php?favorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">  
+            <img class="favorite-image" src='/images/heart-solid-gray.svg'></a>
+          <?php
+          } 
+          $sum = getFavoritCount($t['id']);
+          if($sum[0][0] !== 0)
+          {
+            echo $sum[0][0];
+          } 
+          ?>
         </div>
       </div>
     <?php } ?>
