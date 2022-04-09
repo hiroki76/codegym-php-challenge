@@ -46,6 +46,7 @@ if ($_POST) { /* POST Requests */
         header("Location: index.php");
     }
 }
+
 $tweets = getTweets();
 $tweet_count = count($tweets);
 if(isset($_GET['n'])){
@@ -59,11 +60,7 @@ if(isset($_GET['favorite'])){
    createfavorite($_SESSION['user_id'], $_GET['favorite']);
    header("Location: index.php");
   }
-  
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -77,7 +74,9 @@ if(isset($_GET['favorite'])){
       <div class="card-body">
         <form method="POST">
           <textarea class="form-control" type=textarea name="tweet_textarea" ?><?php if(isset($n)){echo ' '.$n;} ?>&#13;</textarea>
+          <!-- 返信課題はここからのコードを修正しましょう。 -->
           <input type=hidden name="reply_id" value="<?php ini_set('display_errors', 0); echo $_GET['reply']; ?>">
+          <!-- 返信課題はここからのコードを修正しましょう。 -->
           <br>
           <input class="btn btn-primary" type=submit value="投稿">
         </form>
@@ -90,7 +89,10 @@ if(isset($_GET['favorite'])){
           <p class="card-title"><b><?= "{$t['id']}" ?></b> <?= "{$t['name']}" ?> <small><?= "{$t['updated_at']}" ?></small></p>
           <p class="card-text"><?= "{$t['text']}" ?></p>
           <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
-            <?php if($t['reply_id'] > 0){echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';} ?>
+          <?php 
+          if($t['reply_id'] > 0){
+            echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';
+          }?>
           <p><br>
             <?php if(getfavorite($_SESSION['user_id'], $t['id'])){ ?>
                       <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">
@@ -103,7 +105,6 @@ if(isset($_GET['favorite'])){
             if($goukei[0][0] !== 0){
                 echo $goukei[0][0];
             } ?>
-          </p>
         </div>
       </div>
     <?php } ?>
