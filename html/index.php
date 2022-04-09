@@ -15,15 +15,15 @@ require_once('functions.php');
  * @param String $tweet_textarea
  * つぶやき投稿を行う。
  */
-function newtweet($tweet_textarea)
+function newTweet($tweet_textarea)
 {
     // 汎用ログインチェック処理をルータに作る。早期リターンで
     createTweet($tweet_textarea, $_SESSION['user_id']);
 }
 
-function newtweetreply($tweet_textarea)
+function newTweetReply($tweet_textarea)
 {
-    createTweetreply($tweet_textarea, $_SESSION['user_id'], $_POST['reply_id']);
+    createTweetReply($tweet_textarea, $_SESSION['user_id'], $_POST['reply_id']);
 }
 /**
  * ログアウト処理を行う。
@@ -39,37 +39,27 @@ if ($_POST) { /* POST Requests */
         logout();
         header("Location: login.php");
     } else if (isset($_POST['tweet_textarea'])& isset($_POST['reply_id'])) { //reply投稿処理
-        newtweetreply($_POST['tweet_textarea']);
+        newTweetReply($_POST['tweet_textarea']);
         header("Location: index.php");
     } else if (isset($_POST['tweet_textarea'])) { //投稿処理
-        newtweet($_POST['tweet_textarea']);
+        newTweet($_POST['tweet_textarea']);
         header("Location: index.php");
     }
 }
 
 $tweets = getTweets();
-//print_r($tweets);
 $tweet_count = count($tweets);
-<<<<<<< HEAD
 if(isset($_GET['n'])){
   $n = $_GET['n'];
 }
 if(isset($_GET['notfavorite'])){
-    deletefavorite($_SESSION['user_id'], $_GET['notfavorite']);
+    deleteFavorite($_SESSION['user_id'], $_GET['notfavorite']);
     header("Location: index.php");
   }
 if(isset($_GET['favorite'])){ 
-   createfavorite($_SESSION['user_id'], $_GET['favorite']);
+   createFavorite($_SESSION['user_id'], $_GET['favorite']);
    header("Location: index.php");
   }
-=======
-/* 返信課題はここからのコードを修正しましょう。 */
-if(isset($_GET['n'])){
-  $n = $_GET['n'];
-}
-//var_dump($reply);
-/* 返信課題はここからのコードを修正しましょう。 */
->>>>>>> main
 ?>
 
 <!DOCTYPE html>
@@ -98,34 +88,23 @@ if(isset($_GET['n'])){
         <div class="card-body">
           <p class="card-title"><b><?= "{$t['id']}" ?></b> <?= "{$t['name']}" ?> <small><?= "{$t['updated_at']}" ?></small></p>
           <p class="card-text"><?= "{$t['text']}" ?></p>
-<<<<<<< HEAD
           <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
           <?php 
           if($t['reply_id'] > 0){
             echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';
           }?>
           <p><br>
-            <?php if(getfavorite($_SESSION['user_id'], $t['id'])){ ?>
+            <?php if(getFavorite($_SESSION['user_id'], $t['id'])){ ?>
                       <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">
                       <img class="favorite-image" src='/images/heart-solid-red.svg'></a>
             <?php } else { ?>
                       <a id=<?= "{$t['id']}" ?> href="index.php?favorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">  
                       <img class="favorite-image" src='/images/heart-solid-gray.svg'></a>
             <?php } 
-            $goukei = goukeifavorite($t['id']);
-            if($goukei[0][0] !== 0){
-                echo $goukei[0][0];
+            $sum = getFavoritCount($t['id']);
+            if($sum[0][0] !== 0){
+                echo $sum[0][0];
             } ?>
-=======
-          <!--返信課題はここから修正しましょう。-->
-          <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
-          <?php 
-          //var_dump($re);
-          if($t['reply_id'] > 0){
-            echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';
-          }?>
-          <!--返信課題はここまで修正しましょう。-->
->>>>>>> main
         </div>
       </div>
     <?php } ?>
