@@ -63,20 +63,19 @@ function getTweets()
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/* 返信課題はここからのコードを修正しましょう。 */
 function getTweet($id){
     $stmt = getPdo()->query("SELECT * FROM tweets WHERE id = '$id'");
     $rows = $stmt->fetchAll();
     return $rows;
 }
 
-function getusername($user){
+function getUserName($user){
     $stmt = getPdo()->query("SELECT * FROM users WHERE id = '$user'");
     $rows = $stmt->fetchAll();
     return $rows;
 }
 
-    function createTweetreply($text, $user_id, $reply_id)
+function createTweetReply($text, $user_id, $reply_id)
 {
     $sql = 'insert into tweets (text, user_id, created_at, updated_at, reply_id)';
     $sql .= ' values (:text, :user_id, :created_at, :updated_at, :reply_id)';
@@ -89,4 +88,37 @@ function getusername($user){
     $stmt->bindValue(':updated_at', $now, PDO::PARAM_STR);
     return $stmt->execute();
 }
-/* 返信課題はここからのコードを修正しましょう。 */
+
+function createFavorite($member_id, $post_id)
+{
+    $sql = 'insert into favorites (member_id, post_id, created_at, updated_at)';
+    $sql .= ' values (:member_id, :post_id, :created_at, :updated_at)';
+    $now = date("Y-m-d H:i:s");
+    $stmt = getPdo()->prepare($sql);
+    $stmt->bindValue(':member_id', $member_id, PDO::PARAM_INT);
+    $stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
+    $stmt->bindValue(':created_at', $now, PDO::PARAM_STR);
+    $stmt->bindValue(':updated_at', $now, PDO::PARAM_STR);
+    return $stmt->execute();
+}
+
+function getFavorite($member_id, $post_id)
+{
+    $stmt = getPdo()->query("SELECT * FROM favorites WHERE post_id = '$post_id' AND member_id = '$member_id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
+
+function deleteFavorite($member_id, $post_id)
+{
+    $stmt = getPdo()->query("DELETE FROM favorites WHERE post_id = '$post_id' AND member_id = '$member_id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
+
+function getFavoritCount($post_id)
+{
+    $stmt = getPdo()->query("SELECT COUNT(*) AS post_id FROM favorites WHERE post_id = '$post_id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
