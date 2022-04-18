@@ -55,7 +55,7 @@ function createTweet($text, $user_id)
  */
 function getTweets()
 {
-    $sql = 'select t.id, t.text, t.user_id, t.created_at, t.updated_at, u.name, t.reply_id';
+    $sql = 'select t.id, t.text, t.user_id, t.created_at, t.updated_at, u.name, t.reply_id, t.retweet_post_id';
     $sql .= ' from tweets t join users u on t.user_id = u.id';
     $sql .= ' order by t.updated_at desc';
     $stmt = getPdo()->prepare($sql);
@@ -119,6 +119,47 @@ function deleteFavorite($member_id, $post_id)
 function getFavoritCount($post_id)
 {
     $stmt = getPdo()->query("SELECT COUNT(*) AS post_id FROM favorites WHERE post_id = '$post_id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
+
+function createRetweet($text, $user_id, $retweet_post_id)
+{
+    $sql = 'insert into tweets (text, user_id, created_at, updated_at, retweet_post_id)';
+    $sql .= ' values (:text, :user_id, :created_at, :updated_at, :retweet_post_id)';
+    $now = date("Y-m-d H:i:s");
+    $stmt = getPdo()->prepare($sql);
+    $stmt->bindValue(':text', $text, PDO::PARAM_STR);
+    $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(':retweet_post_id', $retweet_post_id, PDO::PARAM_INT);
+    $stmt->bindValue(':created_at', $now, PDO::PARAM_STR);
+    $stmt->bindValue(':updated_at', $now, PDO::PARAM_STR);
+    return $stmt->execute();
+}
+
+function getMyRetweet($user_id, $retweet_post_id)
+{
+    $stmt = getPdo()->query("SELECT * FROM tweets WHERE retweet_post_id = '$retweet_post_id' AND user_id = '$user_id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
+
+function deleteRetweet($user_id, $retweet_post_id)
+{
+    $stmt = getPdo()->query("DELETE FROM tweets WHERE retweet_post_id = '$retweet_post_id' AND user_id = '$user_id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
+
+function getRetweetCount($retweet_post_id)
+{
+    $stmt = getPdo()->query("SELECT COUNT(*) AS retweet_post_id FROM tweets WHERE retweet_post_id = '$retweet_post_id'");
+    $rows = $stmt->fetchAll();
+    return $rows;
+}
+function getRetweet($user_id, $retweet_post_id)
+{
+    $stmt = getPdo()->query("SELECT * FROM tweets WHERE id = '$retweet_post_id' ");
     $rows = $stmt->fetchAll();
     return $rows;
 }
