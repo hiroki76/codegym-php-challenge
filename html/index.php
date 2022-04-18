@@ -35,6 +35,7 @@ function logout()
   $msg = 'ログアウトしました。';
 }
 
+
 if ($_POST) 
 { /* POST Requests */
     if (isset($_POST['logout'])) 
@@ -70,6 +71,18 @@ if(isset($_GET['favorite']))
   createFavorite($_SESSION['user_id'], $_GET['favorite']);
   header("Location: index.php");
 }
+if(isset($_GET['notretweet']))
+{ 
+  deleteRetweet($_SESSION['user_id'], $_GET['notretweet']);
+  header("Location: index.php");
+}
+if(isset($_GET['retweet']))
+{ 
+  createRetweet(NULL, $_SESSION['user_id'], $_GET['retweet']);
+  header("Location: index.php");
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -83,7 +96,7 @@ if(isset($_GET['favorite']))
     <div class="card mb-3">
       <div class="card-body">
         <form method="POST">
-          <textarea class="form-control" type=textarea name="tweet_textarea" ?><?php if(isset($n)){echo ' '.$n;} ?>&#13;</textarea>
+          <textarea class="form-control" type=textarea name="tweet_textarea" ?><?php if(isset($n)){echo ' '.$n.' ';} ?></textarea>
           <input type=hidden name="reply_id" value="<?php ini_set('display_errors', 0); echo $_GET['reply']; ?>">
           <br>
           <input class="btn btn-primary" type=submit value="投稿">
@@ -91,40 +104,80 @@ if(isset($_GET['favorite']))
       </div>
     </div>
     <h1 class="my-5">コメント一覧</h1>
-    <?php foreach ($tweets as $t) { ?>
-      <div class="card mb-3">
-        <div class="card-body">
-          <p class="card-title"><b><?= "{$t['id']}" ?></b> <?= "{$t['name']}" ?> <small><?= "{$t['updated_at']}" ?></small></p>
-          <p class="card-text"><?= "{$t['text']}" ?></p>
-          <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= "{$t['name']}" ?>">[返信する]</a>
-          <?php 
-          if($t['reply_id'] > 0)
-          {
-            echo '<a href="view.php?id='.$t['reply_id'].'">[返信元のメッセージ]</a>';
-          }?>
-          <p><br>
-          <?php
-          if(getFavorite($_SESSION['user_id'], $t['id']))
-          { ?>
-            <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">
-            <img class="favorite-image" src='/images/heart-solid-red.svg'></a>
-          <?php
-          } 
-          else 
-          { ?>
-            <a id=<?= "{$t['id']}" ?> href="index.php?favorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">  
-            <img class="favorite-image" src='/images/heart-solid-gray.svg'></a>
-          <?php
-          } 
-          $sum = getFavoritCount($t['id']);
-          if($sum[0][0] !== 0)
-          {
-            echo $sum[0][0];
-          } 
-          ?>
-        </div>
-      </div>
-    <?php } ?>
+    <?php 
+    foreach ($tweets as $t)
+    {
+      $retweet = 0;
+      $t_name = $t['name'];
+      if($t['retweet_post_id'] !== NULL)
+      {
+        $t = getRetweet($t['user_id'], $t['retweet_post_id']);
+        $t = $t[0];
+        $retweet = 1;
+      }
+      if($t['text'] !== NULL)
+      { ?>
+        <div class="card mb-3">
+          <div class="card-body">
+            <?php
+            if($retweet === 1)
+            {
+              $us = getUserName($t['user_id']);
+              $us = $us[0];
+              echo '<p>'.$us['name'].'さんがリツイートしました。</p>';
+            } ?>
+            <p class="card-title"><b><?= "{$t['id']}" ?></b> <?= $t_name ?> <small><?= "{$t['updated_at']}" ?></small></p>
+            <p class="card-text"><?= "{$t['text']}" ?></p>
+            <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= $t_name ?>">[返信する]</a>
+              <?php
+              if($t['reply_id'] !== 0)
+              { ?>
+                <a href="view.php?id=<?= "{$t['reply_id']}" ?>">[返信元のメッセージ]</a>
+              <?php
+              } ?>
+              <p><br>
+              <?php
+              if(getFavorite($_SESSION['user_id'], $t['id']))
+              { ?>
+                <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">
+                <img class="favorite-image" src='/images/heart-solid-red.svg'></a>
+              <?php
+              }
+              else 
+              { ?>
+                <a id=<?= "{$t['id']}" ?> href="index.php?favorite=<?= "{$t['id']}" ?>#<?= "{$t['id']}" ?>">  
+                <img class="favorite-image" src='/images/heart-solid-gray.svg'></a>
+              <?php
+              }
+              $sum = getFavoritCount($t['id']);
+              if($sum[0][0] !== 0)
+              {
+                echo $sum[0][0];
+              }
+              if(getMyRetweet($_SESSION['user_id'], $t['id']))
+              { ?>
+                &emsp;
+                <a href="index.php?notretweet=<?= "{$t['id']}" ?>">
+                <img class="retweet-image" src='/images/retweet-solid-blue.svg'></a>
+              <?php
+              }
+              else
+              { ?>
+                &emsp;
+                <a href="index.php?retweet=<?= "{$t['id']}" ?>">
+                <img class="retweet-image" src='/images/retweet-solid-gray.svg'></a>
+              <?php
+              }
+              $sum = getRetweetCount($t['id']);
+              if($sum[0][0] !== 0)
+              {
+                echo $sum[0][0];
+              } ?>
+            </div>
+          </div>
+      <?php 
+      }
+    } ?>
     <form method="POST">
       <input type="hidden" name="logout" value="dummy">
       <button class="btn btn-primary">ログアウト</button>
