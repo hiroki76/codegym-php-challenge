@@ -35,7 +35,6 @@ function logout()
   $msg = 'ログアウトしました。';
 }
 
-
 if ($_POST) 
 { /* POST Requests */
     if (isset($_POST['logout'])) 
@@ -54,7 +53,6 @@ if ($_POST)
       header("Location: index.php");
     }
 }
-
 $tweets = getTweets();
 $tweet_count = count($tweets);
 if(isset($_GET['n']))
@@ -78,11 +76,9 @@ if(isset($_GET['notretweet']))
 }
 if(isset($_GET['retweet']))
 { 
-  createRetweet(NULL, $_SESSION['user_id'], $_GET['retweet']);
+  createRetweet(null, $_SESSION['user_id'], $_GET['retweet']);
   header("Location: index.php");
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -107,32 +103,25 @@ if(isset($_GET['retweet']))
     <?php 
     foreach ($tweets as $t)
     {
-      $retweet = 0;
-      $t_name = $t['name'];
-      if($t['retweet_post_id'] !== NULL)
+      $retweet = null;
+      if(isset($t['retweet_post_id']))
       {
-        $t = getRetweet($t['user_id'], $t['retweet_post_id']);
-        $t = $t[0];
-        $retweet = 1;
-      }
-      if($t['text'] !== NULL)
-      { ?>
+        $retweet = getRetweet($t['user_id'], $t['retweet_post_id'])[0];
+        $tTweet = getTweet($t['retweet_post_id'])[0];
+        $uName = getUserName($tTweet['user_id'])[0];
+      } ?>
         <div class="card mb-3">
           <div class="card-body">
             <?php
-            if($retweet === 1)
-            {
-              $us = getUserName($t['user_id']);
-              $us = $us[0];
-              echo '<p>'.$us['name'].'さんがリツイートしました。</p>';
-            } ?>
-            <p class="card-title"><b><?= "{$t['id']}" ?></b> <?= $t_name ?> <small><?= "{$t['updated_at']}" ?></small></p>
-            <p class="card-text"><?= "{$t['text']}" ?></p>
-            <a href="index.php?reply=<?= "{$t['id']}" ?>&n=Re: @<?= $t_name ?>">[返信する]</a>
+            if($retweet === null)
+            { ?>
+              <p class="card-title"><b><?= $t['id'] ?> </b><?= $t['name'] ?> <small><?= $t['updated_at'] ?></small></p>
+              <p class="card-text"><?= $t['text'] ?></p>
+              <a href="index.php?reply=<?= $t['id'] ?>&n=Re: @<?= $t['name'] ?>">[返信する]</a>
               <?php
               if($t['reply_id'] !== 0)
               { ?>
-                <a href="view.php?id=<?= "{$t['reply_id']}" ?>">[返信元のメッセージ]</a>
+                <a href="view.php?id=<?= $t['reply_id'] ?>">[返信元のメッセージ]</a>
               <?php
               } ?>
               <p><br>
@@ -172,12 +161,63 @@ if(isset($_GET['retweet']))
               if($sum[0][0] !== 0)
               {
                 echo $sum[0][0];
+              } 
+            } 
+            if(isset($retweet))
+            { ?>
+              <p><?= getUserName($t['user_id'])[0]['name'] ?>さんがリツイートしました。</p>
+              <p class="card-title"><b> <?= $retweet['id'] ?></b> <?= $uName['name'] ?> <small><?= $retweet['updated_at'] ?></small></p>
+              <p class="card-text"><?= $retweet['text'] ?></p>
+              <a href="index.php?reply=<?= $retweet['id'] ?>&n=Re: @<?= $uName['name'] ?>">[返信する]</a>
+              <?PHP
+              if($retweet['reply_id'] !== 0)
+              { ?>
+                <a href="view.php?id=<?= $retweet['reply_id'] ?>">[返信元のメッセージ]</a>
+              <?php
               } ?>
+              <p><br>
+              <?php
+              if(getFavorite($_SESSION['user_id'], $retweet['id']))
+              { ?>
+                <a id=<?= "{$t['id']}" ?> href="index.php?notfavorite=<?= "{$retweett['id']}" ?>#<?= "{$retweet['id']}" ?>">
+                <img class="favorite-image" src='/images/heart-solid-red.svg'></a>
+              <?php
+              }
+              else 
+              { ?>
+                <a id=<?= "{$retweet['id']}" ?> href="index.php?favorite=<?= "{$retweet['id']}" ?>#<?= "{$retweet['id']}" ?>">  
+                <img class="favorite-image" src='/images/heart-solid-gray.svg'></a>
+              <?php
+              }
+              $sum = getFavoritCount($retweet['id']);
+              if($sum[0][0] !== 0)
+              {
+                echo $sum[0][0];
+              }
+              if(getMyRetweet($_SESSION['user_id'], $retweet['id']))
+              { ?>
+                &emsp;
+                <a href="index.php?notretweet=<?= "{$retweet['id']}" ?>">
+                <img class="retweet-image" src='/images/retweet-solid-blue.svg'></a>
+              <?php
+              }
+              else
+              { ?>
+                &emsp;
+                <a href="index.php?retweet=<?= "{$retweet['id']}" ?>">
+                <img class="retweet-image" src='/images/retweet-solid-gray.svg'></a>
+              <?php
+              }
+              $sum = getRetweetCount($retweet['id']);
+              if($sum[0][0] !== 0)
+              {
+                echo $sum[0][0];
+              } 
+            } ?>
             </div>
           </div>
       <?php 
-      }
-    } ?>
+      } ?>
     <form method="POST">
       <input type="hidden" name="logout" value="dummy">
       <button class="btn btn-primary">ログアウト</button>
