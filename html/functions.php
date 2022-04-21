@@ -159,7 +159,7 @@ function getRetweetCount($retweet_post_id)
 }
 function getRetweet($user_id, $retweet_post_id)
 {
-    $stmt = getPdo()->query("SELECT * FROM tweets WHERE id = '$retweet_post_id' ");
+    $stmt = getPdo()->query("SELECT * FROM tweets WHERE id = '$retweet_post_id'");
     $rows = $stmt->fetchAll();
     return $rows;
 }
